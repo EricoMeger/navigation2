@@ -48,7 +48,7 @@ CollisionChecker::CollisionChecker(
 bool CollisionChecker::isCollisionImminent(
   const geometry_msgs::msg::PoseStamped & robot_pose,
   const double & linear_vel, const double & angular_vel,
-  const double & carrot_dist)
+  const double & carrot_dist, const double & dist_to_path_end)
 {
   // Note(stevemacenski): This may be a bit unusual, but the robot_pose is in
   // odom frame and the carrot_pose is in robot base frame. Just how the data comes to us
@@ -99,8 +99,13 @@ bool CollisionChecker::isCollisionImminent(
         params_->min_approach_linear_velocity)
     );
     if (params_->use_velocity_scaled_lookahead_dist){
-      simulation_distance_limit = std::min(std::max(carrot_dist, params_->min_distance_to_obstacle),
-        params_->max_lookahead_dist);
+      // prevents the checker from looking "through" the goal, considering the safe distance until the path end
+      const double effective_min_dist = std::min(params_->min_distance_to_obstacle, dist_to_path_end);
+
+      // the simulation distance should look at least as far as the effective safety distance
+      const double base_simulation_dist = std::max(carrot_dist, effective_min_dist);
+
+      simulation_distance_limit = std::max(base_simulation_dist, params_->max_lookahead_dist);
     }
   }
   int i = 1;
