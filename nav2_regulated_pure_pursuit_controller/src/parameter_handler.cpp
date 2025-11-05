@@ -204,6 +204,12 @@ ParameterHandler::ParameterHandler(
   node->get_parameter(
     plugin_name_ + ".use_path_aware_safety_distance",
     params_.use_path_aware_safety_distance);
+  if (params_.use_path_aware_safety_distance && params_.min_distance_to_obstacle <= 0.0) {
+    RCLCPP_WARN(
+      logger_,
+      "For 'use_path_aware_safety_distance' to be enabled, 'min_distance_to_obstacle' "
+    "must be set to a positive value, but it is not. The path-aware logic will be ignored.");
+}
   node->get_parameter(plugin_name_ + ".stateful", params_.stateful);
 
   if (params_.inflation_cost_scaling_factor <= 0.0) {
