@@ -210,6 +210,12 @@ ParameterHandler::ParameterHandler(
       "For 'use_path_aware_obstacle_distance' to be enabled, 'min_distance_to_obstacle' "
     "must be set to a positive value, but it is not. The path-aware logic will be ignored.");
   }
+  if (params_.use_path_aware_obstacle_distance && params_.use_velocity_scaled_lookahead_dist) {
+    RCLCPP_WARN(
+      logger_,
+      "For 'use_path_aware_obstacle_distance' to be enabled, 'use_velocity_scaled_lookahead_dist' "
+    "must also be true. The path-aware logic will be ignored.");
+  }
   node->get_parameter(plugin_name_ + ".stateful", params_.stateful);
 
   if (params_.inflation_cost_scaling_factor <= 0.0) {
